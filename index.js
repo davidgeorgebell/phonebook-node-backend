@@ -32,7 +32,7 @@ const currentDate = () => {
   return new Date().toUTCString();
 };
 console.log(currentDate);
-app.get('/api/persons', (req, res) => {
+app.get('/persons', (req, res) => {
   res.json(persons);
 });
 
@@ -43,7 +43,7 @@ app.get('/info', (req, res) => {
   );
 });
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/persons/:id', (req, res) => {
   const id = Number(req.params.id);
   const person = persons.find((person) => person.id === id);
   if (person) {
@@ -51,6 +51,43 @@ app.get('/api/persons/:id', (req, res) => {
   } else {
     res.status(404).end();
   }
+});
+
+// delete
+app.delete('/persons/:id', (req, res) => {
+  const id = Number(req.params.id);
+  person = persons.filter((person) => person.id !== id);
+
+  res.status(204).end();
+});
+// create
+const generateId = () => {
+  const personId = Math.random(...persons.map((p) => p.id));
+  return personId;
+};
+
+app.post('/persons', (req, res) => {
+  const body = req.body;
+
+  if (body.name === undefined) {
+    return res.status(400).json({
+      error: 'content missing'
+    });
+  }
+
+  if (body.number === undefined) {
+    return res.status(400).json({
+      error: 'content missing'
+    });
+  }
+  const person = {
+    name: body.name,
+    number: body.number,
+    id: generateId()
+  };
+  persons = persons.concat(person);
+
+  res.json(person);
 });
 
 const PORT = 3001;
