@@ -67,27 +67,28 @@ const generateId = () => {
 };
 
 app.post('/persons', (req, res) => {
-  const body = req.body;
+  const { name, number } = req.body;
 
-  if (body.name === undefined) {
+  if (!name || !number) {
     return res.status(400).json({
       error: 'content missing'
     });
   }
 
-  if (body.number === undefined) {
-    return res.status(400).json({
-      error: 'content missing'
+  if (!persons.some((e) => e.name === name || e.number === number)) {
+    const person = {
+      name,
+      number,
+      id: generateId()
+    };
+    persons = persons.concat(person);
+
+    res.json(person);
+  } else {
+    return res.status(404).json({
+      error: 'Person name or number duplicated, Please choose another.'
     });
   }
-  const person = {
-    name: body.name,
-    number: body.number,
-    id: generateId()
-  };
-  persons = persons.concat(person);
-
-  res.json(person);
 });
 
 const PORT = 3001;
